@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
+metrics = PrometheusMetrics(app)
 
 restaurants = []
 menus = {}
@@ -43,4 +45,4 @@ def get_menu(restaurant_id):
     return jsonify(menus.get(restaurant_id, []))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)

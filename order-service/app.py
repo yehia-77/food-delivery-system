@@ -1,7 +1,9 @@
 from flask import Flask, jsonify, request
+from prometheus_flask_exporter import PrometheusMetrics
 import pika, json, os
 
 app = Flask(__name__)
+metrics = PrometheusMetrics(app)
 
 orders = []
 
@@ -59,4 +61,4 @@ def get_order(order_id):
     return jsonify(order)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)

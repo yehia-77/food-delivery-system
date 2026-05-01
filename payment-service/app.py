@@ -1,7 +1,9 @@
 from flask import Flask, jsonify, request
+from prometheus_flask_exporter import PrometheusMetrics
 import pika, json, os, threading
 
 app = Flask(__name__)
+metrics = PrometheusMetrics(app)
 
 payments = []
 
@@ -57,4 +59,4 @@ def manual_pay():
 if __name__ == '__main__':
     thread = threading.Thread(target=consume_orders, daemon=True)
     thread.start()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
