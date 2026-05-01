@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  user-service:
+    build: ./user-service
+    ports:
+      - "7001:5000"
+    environment:
+      - ENV=production
+      - RABBITMQ_HOST=rabbitmq
+    networks:
+      - food-network-prod
+    depends_on:
+      - rabbitmq
+    restart: always
+    deploy:
+      replicas: 2
+
+  restaurant-service:
+    build: ./restaurant-service
+    ports:
+      - "7002:5000"
+    environment:
+      - ENV=production
+    networks:
+      - food-network-prod
+    restart: always
+    deploy:
+      replicas: 2
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "7003:5000"
+    environment:
+      - ENV=production
+      - RABBITMQ_HOST=rabbitmq
+    networks:
+      - food-network-prod
+    depends_on:
+      - rabbitmq
+    restart: always
+    deploy:
+      replicas: 2
+
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "7004:5000"
+    environment:
+      - ENV=production
+      - RABBITMQ_HOST=rabbitmq
+    networks:
+      - food-network-prod
+    depends_on:
+      - rabbitmq
+    restart: always
+    deploy:
+      replicas: 2
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5674:5672"
+      - "15674:15672"
+    networks:
+      - food-network-prod
+    restart: always
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9092:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - food-network-prod
+    restart: always
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3002:3000"
+    networks:
+      - food-network-prod
+    depends_on:
+      - prometheus
+    restart: always
+
+networks:
+  food-network-prod:
+    driver: bridge

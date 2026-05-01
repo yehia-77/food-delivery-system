@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  user-service:
+    build: ./user-service
+    ports:
+      - "5001:5000"
+    environment:
+      - ENV=development
+      - RABBITMQ_HOST=rabbitmq
+    networks:
+      - food-network
+    depends_on:
+      - rabbitmq
+
+  restaurant-service:
+    build: ./restaurant-service
+    ports:
+      - "5002:5000"
+    environment:
+      - ENV=development
+    networks:
+      - food-network
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "5003:5000"
+    environment:
+      - ENV=development
+      - RABBITMQ_HOST=rabbitmq
+    networks:
+      - food-network
+    depends_on:
+      - rabbitmq
+
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "5004:5000"
+    environment:
+      - ENV=development
+      - RABBITMQ_HOST=rabbitmq
+    networks:
+      - food-network
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - food-network
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - food-network
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - food-network
+    depends_on:
+      - prometheus
+
+networks:
+  food-network:
+    driver: bridge
